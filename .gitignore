@@ -1,1 +1,16 @@
 CLAUDE.md
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+UpgradeLog.htm
+
+# Build outputs
+bin/
+obj/
+ARM64/
+x64/
+Win32/
+Debug/
+Release/
