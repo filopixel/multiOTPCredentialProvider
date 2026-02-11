@@ -150,6 +150,18 @@ if ($filterDllPath) {
     }
 }
 
+# Disable Win+L (lock workstation) - forces users through LOGON instead of UNLOCK
+# UNLOCK is handled as a fallback (all fields editable) if screensaver/timeout triggers lock
+Write-Host "Disabling Win+L (lock workstation)..." -ForegroundColor Cyan
+try {
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" `
+        -Name "DisableLockWorkstation" -Value 1 -Type DWord
+    Write-Host "  Win+L disabled successfully." -ForegroundColor Green
+}
+catch {
+    Write-Host "  WARNING: Failed to disable Win+L: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
 Write-Host ""
 Write-Host "SUCCESS: Credential Provider installed!" -ForegroundColor Green
 Write-Host ""
@@ -160,10 +172,11 @@ if ($filterDllPath) {
 }
 Write-Host ""
 Write-Host "To test:" -ForegroundColor Cyan
-Write-Host "  1. Press Win+L to lock the screen" -ForegroundColor White
+Write-Host "  1. Log off or restart to reach the logon screen" -ForegroundColor White
 Write-Host "  2. 'Das Credential Provider' should be the only available option" -ForegroundColor White
-Write-Host "  3. Enter your username and password" -ForegroundColor White
-Write-Host "  4. Enter OTP ending in EVEN digit (e.g., 1234) = SUCCESS" -ForegroundColor White
-Write-Host "  5. Enter OTP ending in ODD digit (e.g., 1235) = FAILURE" -ForegroundColor White
+Write-Host "  3. Enter username, password, and OTP" -ForegroundColor White
+Write-Host "  4. OTP ending in EVEN digit (e.g., 1234) = SUCCESS" -ForegroundColor White
+Write-Host "  5. OTP ending in ODD digit (e.g., 1235) = FAILURE" -ForegroundColor White
+Write-Host "  6. Win+L is disabled (lock workstation disabled by policy)" -ForegroundColor White
 Write-Host ""
 Write-Host "To uninstall, run: .\Uninstall-CredentialProvider.ps1" -ForegroundColor Gray

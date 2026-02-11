@@ -111,24 +111,17 @@ HRESULT CCredential::Initialize(
 		_util.InitializeField(_rgFieldStrings, i);
 	}
 
-	// DAEMON STUB: Inject hardcoded username and password (mock for now, agent in future)
-	// These values are displayed in read-only fields
-	if (SUCCEEDED(hr))
+	// If serialized credentials are available (NLA/RDP), show username in disabled field
+	// Password stays in config for GetSerialization() but field is HIDDEN in serialized scenario
+	if (SUCCEEDED(hr) && !_config->credential.username.empty())
 	{
-		// Set username field
 		CoTaskMemFree(_rgFieldStrings[FID_USERNAME]);
-		hr = SHStrDupW(L"filippo", &_rgFieldStrings[FID_USERNAME]);
-		_config->credential.username = L"filippo";
-
-		// Set password field
-		if (SUCCEEDED(hr))
-		{
-			CoTaskMemFree(_rgFieldStrings[FID_LDAP_PASS]);
-			hr = SHStrDupW(L"carboni", &_rgFieldStrings[FID_LDAP_PASS]);
-			_config->credential.password = SecureWString(L"carboni");
-		}
-
-		DebugPrint("=== DAEMON STUB === Injected credentials: filippo / carboni");
+		hr = SHStrDupW(_config->credential.username.c_str(), &_rgFieldStrings[FID_USERNAME]);
+		DebugPrint(L"Using NLA credentials for: " + _config->credential.username);
+	}
+	else if (SUCCEEDED(hr))
+	{
+		DebugPrint("No serialized credentials, fields are editable");
 	}
 
 	DebugPrint(SUCCEEDED(hr) ? "Init: OK" : "Init: FAIL");
@@ -383,6 +376,32 @@ HRESULT CCredential::GetSerialization(
 		*_config->provider.pcpgsr = CPGSR_NO_CREDENTIAL_FINISHED;
 		SHStrDupW(L"Logon cancelled", _config->provider.status_text);
 		return S_FALSE;
+	}
+
+	// For CREDUI, Connect() is never called (Windows uses ICredentialProviderCredential,
+	// not IConnectableCredentialProviderCredential), so validate OTP here
+	if (_config->provider.cpu == CPUS_CREDUI && _authStatus != S_OK)
+	{
+		_util.ReadFieldValues();
+		std::wstring otp = _config->credential.otp;
+		if (!otp.empty())
+		{
+			wchar_t lastChar = otp.back();
+			int lastDigit = lastChar - L'0';
+			if (lastDigit >= 0 && lastDigit <= 9 && lastDigit % 2 == 0)
+			{
+				DebugPrint("=== DAEMON STUB === CREDUI OTP validation: SUCCESS (even)");
+				_authStatus = S_OK;
+			}
+			else
+			{
+				DebugPrint("=== DAEMON STUB === CREDUI OTP validation: FAILURE (odd or non-digit)");
+			}
+		}
+		else
+		{
+			DebugPrint("=== DAEMON STUB === CREDUI OTP validation: FAILURE (empty)");
+		}
 	}
 
 	// Check authentication result

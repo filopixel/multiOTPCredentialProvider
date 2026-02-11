@@ -102,6 +102,17 @@ catch {
     # Ignore errors - entries may not exist
 }
 
+# Re-enable Win+L (lock workstation)
+Write-Host "Re-enabling Win+L (lock workstation)..." -ForegroundColor Cyan
+try {
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" `
+        -Name "DisableLockWorkstation" -ErrorAction SilentlyContinue
+    Write-Host "  Win+L re-enabled successfully." -ForegroundColor Green
+}
+catch {
+    # Ignore errors - property may not exist
+}
+
 Write-Host ""
 Write-Host "SUCCESS: Credential Provider and Filter uninstalled!" -ForegroundColor Green
 Write-Host ""

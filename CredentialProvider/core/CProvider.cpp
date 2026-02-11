@@ -342,10 +342,19 @@ HRESULT CProvider::GetCredentialAt(
 
 		_credential = std::make_unique<CCredential>(_config);
 
-		// Select scenario based on usage
-		const FIELD_STATE_PAIR* fieldStatePair = (usage_scenario == CPUS_UNLOCK_WORKSTATION)
-			? s_rgScenarioUnlock
-			: s_rgScenarioLogon;
+		// Select scenario: if serialized credentials available (RDP/NLA) → fields disabled
+		// Otherwise (local logon, unlock, CREDUI) → all fields editable
+		const FIELD_STATE_PAIR* fieldStatePair;
+		if (_SerializationAvailable(SAF_USERNAME) && _SerializationAvailable(SAF_PASSWORD))
+		{
+			fieldStatePair = s_rgScenarioLogonSerialized;
+			DebugPrint("Using serialized scenario (RDP/NLA): username disabled, password hidden, OTP editable");
+		}
+		else
+		{
+			fieldStatePair = s_rgScenarioLogon;
+			DebugPrint("Using local scenario: all fields editable");
+		}
 
 		hr = _credential->Initialize(
 			s_rgScenarioCredProvFieldDescriptors,

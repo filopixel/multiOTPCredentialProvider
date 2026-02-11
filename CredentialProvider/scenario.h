@@ -22,29 +22,29 @@ struct FIELD_STATE_PAIR
 	CREDENTIAL_PROVIDER_FIELD_INTERACTIVE_STATE cpfis; // Allowed values : CPFIS_NONE, CPFIS_READONLY, CPFIS_DISABLED, CPFIS_FOCUSED
 };
 
-// Scenario: LOGON - Show username, password, OTP fields
-// Username and Password are DISABLED (greyed out, injected by agent/mock)
+// Scenario: LOGON/UNLOCK/CREDUI - All fields editable (user types everything)
+// Used for local logon, unlock fallback, and UAC/RunAs
 static const FIELD_STATE_PAIR s_rgScenarioLogon[] =
 {
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
 	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SMALL_TEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_USERNAME (disabled, injected)
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_LDAP_PASS (disabled, injected)
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP (editable, user enters this)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_USERNAME (editable)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_LDAP_PASS (editable)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_OTP (editable)
 	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
 };
 
-// Scenario: UNLOCK - Hide username (already known), show password and OTP
-// Password is DISABLED (greyed out, injected by agent/mock)
-static const FIELD_STATE_PAIR s_rgScenarioUnlock[] =
+// Scenario: RDP/NLA - Username visible (disabled), password HIDDEN, only OTP editable
+// NLA credentials are stored in config for serialization but password field is not shown
+static const FIELD_STATE_PAIR s_rgScenarioLogonSerialized[] =
 {
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_SMALL_TEXT (shows username)
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_LDAP_PASS (disabled, injected)
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP (editable, user enters this)
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SMALL_TEXT
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_USERNAME (from NLA, visible but disabled)
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_LDAP_PASS (from NLA, HIDDEN)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP (editable, focused)
 	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
 };
 

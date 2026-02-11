@@ -216,10 +216,6 @@ HRESULT Utilities::SetScenario(
 		DebugPrint("SetScenario: LOGON");
 		hr = SetFieldStatePairBatch(pCredential, pCPCE, s_rgScenarioLogon);
 		break;
-	case SCENARIO::UNLOCK:
-		DebugPrint("SetScenario: UNLOCK");
-		hr = SetFieldStatePairBatch(pCredential, pCPCE, s_rgScenarioUnlock);
-		break;
 	case SCENARIO::NO_CHANGE:
 	default:
 		break;
@@ -412,32 +408,29 @@ HRESULT Utilities::ReadFieldValues()
 
 HRESULT Utilities::ReadUserField()
 {
-	if (_config->provider.cpu != CPUS_UNLOCK_WORKSTATION)
+	wstring input(_config->provider.field_strings[FID_USERNAME]);
+	DebugPrint(L"Loading user/domain from GUI: '" + input + L"'");
+	wstring user_name, domain_name;
+
+	auto const pos = input.find_first_of(L"\\", 0);
+	if (pos == std::string::npos)
 	{
-		wstring input(_config->provider.field_strings[FID_USERNAME]);
-		DebugPrint(L"Loading user/domain from GUI: '" + input + L"'");
-		wstring user_name, domain_name;
+		user_name = wstring(input);
+	}
+	else
+	{
+		user_name = wstring(input.substr(pos + 1, input.size()));
+		domain_name = wstring(input.substr(0, pos));
+	}
 
-		auto const pos = input.find_first_of(L"\\", 0);
-		if (pos == std::string::npos)
-		{
-			user_name = wstring(input);
-		}
-		else
-		{
-			user_name = wstring(input.substr(pos + 1, input.size()));
-			domain_name = wstring(input.substr(0, pos));
-		}
+	if (!user_name.empty())
+	{
+		_config->credential.username = user_name;
+	}
 
-		if (!user_name.empty())
-		{
-			_config->credential.username = user_name;
-		}
-
-		if (!domain_name.empty())
-		{
-			_config->credential.domain = domain_name;
-		}
+	if (!domain_name.empty())
+	{
+		_config->credential.domain = domain_name;
 	}
 
 	return S_OK;
@@ -471,14 +464,8 @@ HRESULT Utilities::ResetScenario(
 {
 	DebugPrint(__FUNCTION__);
 
-	if (_config->provider.cpu == CPUS_UNLOCK_WORKSTATION)
-	{
-		SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::UNLOCK);
-	}
-	else
-	{
-		SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::LOGON);
-	}
+	// All scenarios (logon, unlock, credui) use the same LOGON layout
+	SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::LOGON);
 
 	return S_OK;
 }
