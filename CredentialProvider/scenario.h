@@ -1,6 +1,6 @@
 #pragma once
 
-// The indexes of each of the fields in our credential provider's appended tiles.
+// Simplified field IDs for daemon stub credential provider
 enum FIELD_ID
 {
 	FID_LOGO = 0,
@@ -9,16 +9,8 @@ enum FIELD_ID
 	FID_USERNAME = 3,
 	FID_LDAP_PASS = 4,
 	FID_OTP = 5,
-	FID_NEW_PASS_1 = 6,
-	FID_NEW_PASS_2 = 7,
-	FID_SUBMIT_BUTTON = 8,
-	FID_SUBTEXT = 9,
-	FID_LASTUSER_LOGGED = 10,
-	FID_REQUIRE_SMS = 11,
-	FID_REQUIRE_EMAIL = 12,
-	FID_CODE_SENT_SMS = 13,
-	FID_CODE_SENT_EMAIL = 14,
-	FID_NUM_FIELDS = 15
+	FID_SUBMIT_BUTTON = 6,
+	FID_NUM_FIELDS = 7
 };
 
 // The first value indicates when the tile is displayed (selected, not selected)
@@ -26,130 +18,34 @@ enum FIELD_ID
 struct FIELD_STATE_PAIR
 {
 	// Source : https://docs.microsoft.com/en-us/windows/win32/api/credentialprovider/ne-credentialprovider-credential_provider_field_state
-	CREDENTIAL_PROVIDER_FIELD_STATE cpfs; // Alowed values CPFS_HIDDEN,	CPFS_DISPLAY_IN_SELECTED_TILE, CPFS_DISPLAY_IN_DESELECTED_TILE,	CPFS_DISPLAY_IN_BOTH
+	CREDENTIAL_PROVIDER_FIELD_STATE cpfs; // Allowed values CPFS_HIDDEN, CPFS_DISPLAY_IN_SELECTED_TILE, CPFS_DISPLAY_IN_DESELECTED_TILE, CPFS_DISPLAY_IN_BOTH
 	CREDENTIAL_PROVIDER_FIELD_INTERACTIVE_STATE cpfis; // Allowed values : CPFIS_NONE, CPFIS_READONLY, CPFIS_DISABLED, CPFIS_FOCUSED
 };
 
-// These two arrays are seperate because a credential provider might
-// want to set up a credential with various combinations of field state pairs 
-// and field descriptors.
-
-// The field state value indicates whether the field is displayed
-// in the selected tile, the deselected tile, or both.
-// The Field interactive state indicates when 
-static const FIELD_STATE_PAIR s_rgScenarioDisplayAllFields[] =
+// Scenario: LOGON - Show username, password, OTP fields
+// Username and Password are DISABLED (greyed out, injected by agent/mock)
+static const FIELD_STATE_PAIR s_rgScenarioLogon[] =
 {
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
 	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SMALL_TEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_LDAP_PASS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_OTP
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_USERNAME (disabled, injected)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_LDAP_PASS (disabled, injected)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP (editable, user enters this)
 	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },           // FID_LASTUSER_LOGGED
-	{ CPFS_HIDDEN, CPFIS_NONE },           // FID_REQUIRE_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE },           // FID_REQUIRE_EMAIL
-	{ CPFS_HIDDEN, CPFIS_NONE },           // FID_CODE_SENT_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE }           // FID_CODE_SENT_EMAIL
 };
 
-static const FIELD_STATE_PAIR s_rgScenarioUnlockPasswordOTP[] =
+// Scenario: UNLOCK - Hide username (already known), show password and OTP
+// Password is DISABLED (greyed out, injected by agent/mock)
+static const FIELD_STATE_PAIR s_rgScenarioUnlock[] =
 {
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
 	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_SMALL_TEXT
+	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_SMALL_TEXT (shows username)
 	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_LDAP_PASS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_OTP
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_DISABLED },		// FID_LDAP_PASS (disabled, injected)
+	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP (editable, user enters this)
 	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_LASTUSER_LOGGED
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_REQUIRE_SMS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_REQUIRE_EMAIL
-	{ CPFS_HIDDEN, CPFIS_NONE},           // FID_CODE_SENT_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE}            // FID_CODE_SENT_EMAIL
-};
-
-static const FIELD_STATE_PAIR s_rgScenarioSecondStepOTP[] =
-{
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SMALL_TEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_LDAP_PASS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_OTP
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_LASTUSER_LOGGED
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_REQUIRE_SMS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_REQUIRE_EMAIL
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_CODE_SENT_SMS
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE}            // FID_CODE_SENT_EMAIL
-};
-
-static const FIELD_STATE_PAIR s_rgScenarioLogonFirstStepUserLDAP[] =
-{
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SMALL_TEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_LDAP_PASS
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_OTP
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE},           // FID_LASTUSER_LOGGED
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_REQUIRE_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_REQUIRE_EMAIL
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_CODE_SENT_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE}                              // FID_CODE_SENT_EMAIL
-};
-
-// Show all 3 fields for password change
-static const FIELD_STATE_PAIR s_rgScenarioPasswordChange[] =
-{
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SMALL_TEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_LDAP_PASS
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_OTP
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_NEW_PASS_1
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_NEW_PASS_1
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_LASTUSER_LOGGED
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_REQUIRE_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_REQUIRE_EMAIL
-	{ CPFS_HIDDEN, CPFIS_NONE},                             // FID_CODE_SENT_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE}                              // FID_CODE_SENT_EMAIL
-};
-
-static const FIELD_STATE_PAIR s_rgScenarioUnlockFirstStepPassword[] =
-{
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT
-	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_SMALL_TEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },		// FID_LDAP_PASS
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_OTP
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_NEW_PASS_1
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
-	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBTEXT
-	{ CPFS_HIDDEN, CPFIS_NONE },                             // FID_LASTUSER_LOGGED
-	{ CPFS_HIDDEN, CPFIS_NONE },                            // FID_REQUIRE_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE },                            // FID_REQUIRE_EMAIL
-	{ CPFS_HIDDEN, CPFIS_NONE },                             // FID_CODE_SENT_SMS
-	{ CPFS_HIDDEN, CPFIS_NONE }                              // FID_CODE_SENT_EMAIL
 };
 
 // Field descriptors for unlock and logon.
@@ -158,19 +54,11 @@ static const FIELD_STATE_PAIR s_rgScenarioUnlockFirstStepPassword[] =
 // The third is the name of the field, NOT the value which will appear in the field.
 static CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR s_rgScenarioCredProvFieldDescriptors[] =
 {
-	{ FID_LOGO, CPFT_TILE_IMAGE, L"privacyIDEA Login" },
+	{ FID_LOGO, CPFT_TILE_IMAGE, L"Daemon Stub Login" },
 	{ FID_LARGE_TEXT, CPFT_LARGE_TEXT, L"LargeText" },
 	{ FID_SMALL_TEXT, CPFT_SMALL_TEXT, L"SmallText" },
 	{ FID_USERNAME, CPFT_EDIT_TEXT, L"Username" },
 	{ FID_LDAP_PASS, CPFT_PASSWORD_TEXT, L"Password" },
 	{ FID_OTP, CPFT_EDIT_TEXT, L"One-Time Password" },
-	{ FID_NEW_PASS_1, CPFT_PASSWORD_TEXT, L"New Password" },
-	{ FID_NEW_PASS_2, CPFT_PASSWORD_TEXT, L"Confirm password" },
 	{ FID_SUBMIT_BUTTON, CPFT_SUBMIT_BUTTON, L"Submit" },
-	{ FID_SUBTEXT, CPFT_SMALL_TEXT, L"Sign in to: "},
-	{ FID_LASTUSER_LOGGED, CPFT_COMMAND_LINK,  L"Last authenticated user"},
-	{ FID_REQUIRE_SMS, CPFT_COMMAND_LINK,  L"Receive an OTP by SMS"},
-	{ FID_REQUIRE_EMAIL, CPFT_COMMAND_LINK,  L"Receive an OTP by E-MAIL"},
-	{ FID_CODE_SENT_SMS, CPFT_COMMAND_LINK,  L"OTP token sent by SMS"},
-	{ FID_CODE_SENT_EMAIL, CPFT_COMMAND_LINK,  L"OTP token sent by EMAIL"},	
 };

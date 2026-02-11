@@ -1,7 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright	2012 Dominik Pretzsch
-**				2017 NetKnights GmbH
+** Original work Copyright 2012 Dominik Pretzsch
+**                          2017 NetKnights GmbH
+** Modified work Copyright 2026 Adamantic
 **
 ** Author		Dominik Pretzsch
 **				Nils Behlen
@@ -29,7 +30,6 @@
 #include "Logger.h"
 #include "Shared.h"
 #include <unknwn.h>
-#include "MultiOTPRegistryReader.h"
 
 HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv)
 {
@@ -64,48 +64,26 @@ HRESULT CCredentialProviderFilter::Filter(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpu
 	case CPUS_CREDUI:
 		break;
 	case CPUS_CHANGE_PASSWORD:
-		return E_NOTIMPL; // TODO 
+		return E_NOTIMPL;
 	default:
 		return E_INVALIDARG;
 	}
 
-	if (!Shared::IsRequiredForScenario(cpus, FILTER))
-	{
-		DebugPrint("Filter is configured to be disabled for this scenario.");
-		return S_OK;
-	}
-
-	MultiOTPRegistryReader rr(L"CLSID\\{FCEFDFAB-B0A1-4C4D-8B2B-4FF4E0A3D978}\\");
-	MultiOTPRegistryReader rcp(L"");
-	std::wstring provider_name;
-	std::wstring included_providers_id;
-	included_providers_id = rr.getRegistry(L"included_providers_id");
-
-	OLECHAR* guidString;
+	// Simple filter logic: Allow only DasCredentialProvider, hide all others
+	// This forces users to use DasCredentialProvider for logon/unlock
 	for (DWORD i = 0; i < cProviders; i++)
 	{
-		StringFromCLSID(rgclsidProviders[i], &guidString);
-		if (IsEqualGUID(rgclsidProviders[i], CLSID_COTP_LOGON) || included_providers_id.find(guidString) != std::string::npos)
+		if (IsEqualGUID(rgclsidProviders[i], CLSID_COTP_LOGON))
 		{
-			rgbAllow[i] = TRUE;
+			rgbAllow[i] = TRUE;  // Show DasCredentialProvider
+			DebugPrint("Allowing DasCredentialProvider");
 		}
 		else
 		{
-			rgbAllow[i] = FALSE;
-		}
-
-
-		if (included_providers_id == L"?") {
-			rcp.setPath(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers\\"+ std::wstring(guidString));
-			provider_name = rcp.getRegistry(L"", HKEY_LOCAL_MACHINE);
-			Logger::Get().releaseLog = true;
-			if (provider_name != L"") {
-				ReleaseDebugPrint(provider_name+L" -> "+ guidString);
-			}
-			Logger::Get().releaseLog = false;
+			rgbAllow[i] = FALSE; // Hide all other providers
 		}
 	}
-	::CoTaskMemFree(guidString);
+
 	return S_OK;
 }
 
@@ -124,11 +102,9 @@ CCredentialProviderFilter::~CCredentialProviderFilter()
 
 HRESULT CCredentialProviderFilter::UpdateRemoteCredential(const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcsIn, CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcsOut)
 {
-	//UNREFERENCED_PARAMETER(pcpsIn);
-	//UNREFERENCED_PARAMETER(pcpcsOut);
 	DebugPrint(__FUNCTION__);
-	
-	if (!pcpcsIn) 
+
+	if (!pcpcsIn)
 	{
 		// no point continuing as there are no credentials
 		return E_NOTIMPL;
@@ -139,7 +115,7 @@ HRESULT CCredentialProviderFilter::UpdateRemoteCredential(const CREDENTIAL_PROVI
 	pcpcsOut->cbSerialization = pcpcsIn->cbSerialization;
 	pcpcsOut->rgbSerialization = pcpcsIn->rgbSerialization;
 
-	// set target CP to our CP
+	// set target CP to our CP (DasCredentialProvider)
 	pcpcsOut->clsidCredentialProvider = CLSID_COTP_LOGON;
 
 	// copy the buffer contents if needed

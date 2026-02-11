@@ -1,7 +1,10 @@
 /* * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright 2020 NetKnights GmbH
+** DasCredentialProvider - Shared Library
+**
+** Original work Copyright 2020 NetKnights GmbH
 ** Author: Nils Behlen
+** Modified work Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.

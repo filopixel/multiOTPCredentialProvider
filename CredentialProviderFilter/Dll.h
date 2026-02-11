@@ -1,7 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * *
 **
 ** Original work Copyright 2012 Dominik Pretzsch
-**                          2020-2026 SysCo systemes de communication sa
 ** Modified work Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +17,17 @@
 **
 ** * * * * * * * * * * * * * * * * * * */
 
-#ifndef _GUID_H
-#define _GUID_H
 #pragma once
 
-#include <guiddef.h>
+#include <windows.h>
+#include <unknwn.h>
+#include <shlwapi.h>
+#include <strsafe.h>
+#include <stdio.h>
 
-// DasCredentialProvider CLSID
-// {07B5C3C1-5E97-4CAE-855B-84966AC4132F}
-DEFINE_GUID(CLSID_CSample,
-	0x07b5c3c1, 0x5e97, 0x4cae, 0x85, 0x5b, 0x84, 0x96, 0x6a, 0xc4, 0x13, 0x2f);
+// global dll hinstance
+extern HINSTANCE g_hinst;
+#define HINST_THISDLL g_hinst
 
-#endif
+void DllAddRef() noexcept;
+void DllRelease() noexcept;

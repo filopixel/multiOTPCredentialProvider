@@ -1,9 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright 2020 NetKnights GmbH
-**           2020-2026 SysCo systemes de communication sa
-** Author: Nils Behlen
-**         Yann Jeanrenaud, Andre Liechti
+** DasCredentialProvider - Shared Library
+**
+** Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.
@@ -21,9 +20,7 @@
 
 #include "Shared.h"
 #include "Logger.h"
-#include "RegistryReader.h"
 #include <tchar.h>
-#include "MultiOTPRegistryReader.h"
 
 namespace Shared {
 	bool IsRequiredForScenario(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, int caller)
@@ -35,27 +32,13 @@ namespace Shared {
 			return false;
 		}
 
-		MultiOTPRegistryReader rr(L"CLSID\\{FCEFDFAB-B0A1-4C4D-8B2B-4FF4E0A3D978}\\");
-		std::wstring entry;
-		const bool isRemote = Shared::IsCurrentSessionRemote();
-
 		switch (cpus)
 		{
 		case CPUS_LOGON:
-		{
-			entry = rr.getRegistry(L"cpus_logon");
-			break;
-		}
 		case CPUS_UNLOCK_WORKSTATION:
-		{
-			entry = rr.getRegistry(L"cpus_unlock");
-			break;
-		}
 		case CPUS_CREDUI:
-		{
-			entry = rr.getRegistry(L"cpus_credui");
-			break;
-		}
+			// Daemon stub: always enabled for these scenarios
+			return true;
 		case CPUS_CHANGE_PASSWORD:
 		case CPUS_PLAP:
 		case CPUS_INVALID:
@@ -63,22 +46,6 @@ namespace Shared {
 		default:
 			return false;
 		}
-
-		// default - no additional config found
-		if (entry.empty()) return true;
-		
-		if (caller == FILTER)
-		{
-			// Check that we don't filter if the CP is not enumerated
-			return (entry == L"0e" || (entry == L"1e" && isRemote) || (entry == L"2e" && (!isRemote || cpus==CPUS_LOGON || cpus == CPUS_UNLOCK_WORKSTATION)));
-		}
-		else if (caller == PROVIDER)
-		{
-			// 0 means fully enabled, 1-only remote, 2-non-remote, 3-disabled
-			return ((entry.at(0) == L'1' && isRemote) || (entry.at(0) == L'2' && (!isRemote || cpus == CPUS_LOGON || cpus == CPUS_UNLOCK_WORKSTATION)) || (entry.at(0) == L'0'));
-		}
-
-		return false;
 	}
 
 #define TERMINAL_SERVER_KEY _T("SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\")

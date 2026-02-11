@@ -1,14 +1,15 @@
 /* * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright 2012 Dominik Pretzsch
-**           2020-2026 SysCo systemes de communication sa
-** 
+** Original work Copyright 2012 Dominik Pretzsch
+**                          2020-2026 SysCo systemes de communication sa
+** Modified work Copyright 2026 Adamantic
+**
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.
 **    You may obtain a copy of the License at
-** 
+**
 **        http://www.apache.org/licenses/LICENSE-2.0
-** 
+**
 **    Unless required by applicable law or agreed to in writing, software
 **    distributed under the License is distributed on an "AS IS" BASIS,
 **    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,15 +18,20 @@
 **
 ** * * * * * * * * * * * * * * * * * * */
 
-// {34065473-D75F-4BC2-9782-E98E63ED0D41}
+#ifndef _FILTER_GUID_H
+#define _FILTER_GUID_H
+#pragma once
+
+#include <guiddef.h>
+
+// DasCredentialProviderFilter CLSID
+// {D1CA3136-738F-4466-A973-1C46BD9F0385}
 DEFINE_GUID(CLSID_CSample,
-	0xfcefdfab, 0xb0a1, 0x4c4d, 0x8b, 0x2b, 0x4f, 0xf4, 0xe0, 0xa3, 0xd9, 0x79);
+	0xd1ca3136, 0x738f, 0x4466, 0xa9, 0x73, 0x1c, 0x46, 0xbd, 0x9f, 0x03, 0x85);
 
-
-// GUID of primary Credential Provider
-// {7BAF541E-F8E0-4EDF-B69A-BD2771139E8E}
+// DasCredentialProvider CLSID (referenced by Filter)
+// {07B5C3C1-5E97-4CAE-855B-84966AC4132F}
 DEFINE_GUID(CLSID_COTP_LOGON,
-	0xfcefdfab, 0xb0a1, 0x4c4d, 0x8b, 0x2b, 0x4f, 0xf4, 0xe0, 0xa3, 0xd9, 0x78);
+	0x07b5c3c1, 0x5e97, 0x4cae, 0x85, 0x5b, 0x84, 0x96, 0x6a, 0xc4, 0x13, 0x2f);
 
-
-// ADD ADDITIONAL HERE
+#endif

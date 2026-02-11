@@ -1,7 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright	2012 Dominik Pretzsch
-**				2017 NetKnights GmbH
+** Original work Copyright 2012 Dominik Pretzsch
+**                          2017 NetKnights GmbH
+** Modified work Copyright 2026 Adamantic
 **
 ** Author		Dominik Pretzsch
 **				Nils Behlen

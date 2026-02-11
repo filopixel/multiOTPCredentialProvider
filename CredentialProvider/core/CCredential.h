@@ -1,12 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright	2012 Dominik Pretzsch
-**				2017 NetKnights GmbH
-**				2020-2026 SysCo systemes de communication sa
+** DasCredentialProvider - CCredential
 **
-** Author		Dominik Pretzsch
-**				Nils Behlen
-**				Yann Jeanrenaud, Andre Liechti
+** Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.
@@ -26,16 +22,12 @@
 
 #include "Dll.h"
 #include "Utilities.h"
-#include "MultiOTPConfiguration.h"
-#include "PrivacyIDEA.h"
+#include "Configuration.h"
 #include <scenario.h>
 #include <unknwn.h>
 #include <helpers.h>
 #include <string>
-#include <map>
-#include "MultiOTP.h"
-#include "mq.h" // multiOTP/yj
-#include "sddl.h" // multiOTP/yj
+#include <memory>
 
 #define NOT_EMPTY(NAME) \
 	(NAME != NULL && NAME[0] != NULL)
@@ -109,15 +101,15 @@ public:
 
 
 public:
-	// IConnectableCredentialProviderCredential 
+	// IConnectableCredentialProviderCredential
 	IFACEMETHODIMP Connect(__in IQueryContinueWithStatus* pqcws);
 	IFACEMETHODIMP Disconnect();
 
-	CCredential(std::shared_ptr<MultiOTPConfiguration> c);
+	CCredential(std::shared_ptr<Configuration> c);
 	virtual ~CCredential();
 
 public:
-	HRESULT Initialize(//__in CProvider* pProvider,
+	HRESULT Initialize(
 		__in const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR* rgcpfd,
 		__in const FIELD_STATE_PAIR* rgfsp,
 		__in_opt PWSTR user_name,
@@ -125,40 +117,18 @@ public:
 		__in_opt PWSTR password);
 
 private:
-
 	void ShowErrorMessage(const std::wstring& message, const HRESULT& code);
-
-	void PushAuthenticationCallback(bool success);
 
 	LONG									_cRef;
 
-	CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR	_rgCredProvFieldDescriptors[FID_NUM_FIELDS];	// An array holding the type and 
-																							// name of each field in the tile.
+	CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR	_rgCredProvFieldDescriptors[FID_NUM_FIELDS];
+	FIELD_STATE_PAIR						_rgFieldStatePairs[FID_NUM_FIELDS];
+	wchar_t* _rgFieldStrings[FID_NUM_FIELDS];
 
-	FIELD_STATE_PAIR						_rgFieldStatePairs[FID_NUM_FIELDS];          // An array holding the state of 
-																						 // each field in the tile.
-
-	wchar_t* _rgFieldStrings[FID_NUM_FIELDS];			 // An array holding the string 
-																						 // value of each field. This is 
-																						 // different from the name of 
-																						 // the field held in 
-																						 // _rgCredProvFieldDescriptors.
 	ICredentialProviderCredentialEvents* _pCredProvCredentialEvents;
 
-	DWORD                                   _dwComboIndex;                               // Tracks the current index 
-																						 // of our combobox.
-
-	MultiOTP								_privacyIDEA;
-
-	std::shared_ptr<MultiOTPConfiguration>			_config;
-
+	std::shared_ptr<Configuration>			_config;
 	Utilities								_util;
 
-	HRESULT									_piStatus = E_FAIL;
-	void storeLastConnectedUserIfNeeded();
-	std::wstring cleanUsername(std::wstring message);
-	HRESULT getSid(LPCWSTR wszAccName, PSID* ppSid);
-	HRESULT storeSidAndTimeStamp(PSID ppsid);
-	bool CCredential::hasloggedInRecently(LPTSTR userId);
-	LPTSTR getSidFromUsername(std::wstring username);
+	HRESULT									_authStatus = E_FAIL;
 };

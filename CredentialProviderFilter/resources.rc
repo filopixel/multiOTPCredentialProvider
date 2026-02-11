@@ -14,10 +14,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
+// English (United States) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -26,19 +26,19 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 //
 
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
     "#include ""afxres.h""\r\n"
     "#include ""version.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
     "\r\n"
     "\0"
@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,10,1,2
- PRODUCTVERSION 5,10,1,2
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,14 +69,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "SysCo systemes de communication sa"
-            VALUE "FileDescription", "CredentialProviderFilter for the multiOTP CredentialProvider for Windows logon"
-            VALUE "FileVersion", "5.10.1.2"
-            VALUE "InternalName", "multiOTPCredentialProviderFilter.dll"
-            VALUE "LegalCopyright", "Copyright (c) 2026 SysCo systemes de communication sa, 2019 NetKnights, 2016 Last Squirrel IT"
-            VALUE "OriginalFilename", "multiOTPCredentialProviderFilter.dll"
-            VALUE "ProductName", "multiOTPCredentialProvider"
-            VALUE "ProductVersion", "5.10.1.2"
+            VALUE "CompanyName", "Adamantic"
+            VALUE "FileDescription", "Das Credential Provider Filter for Windows logon"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "DasCredentialProviderFilter.dll"
+            VALUE "LegalCopyright", "Copyright (c) 2026 Adamantic. Based on work by SysCo, NetKnights, Last Squirrel IT"
+            VALUE "OriginalFilename", "DasCredentialProviderFilter.dll"
+            VALUE "ProductName", "DasCredentialProvider"
+            VALUE "ProductVersion", "1.0.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -85,7 +85,7 @@ BEGIN
     END
 END
 
-#endif    // German (Germany) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -99,4 +99,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

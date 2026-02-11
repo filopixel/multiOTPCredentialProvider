@@ -1,7 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright 2019 NetKnights GmbH
-** Author: Nils Behlen
+** DasCredentialProvider Configuration
+**
+** Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.
@@ -18,8 +19,6 @@
 ** * * * * * * * * * * * * * * * * * * */
 
 #pragma once
-#include "PIConf.h"
-#include "Challenge.h"
 #include "SecureString.h"
 #include <string>
 #include <credentialprovider.h>
@@ -27,64 +26,21 @@
 class Configuration
 {
 public:
-
-	static const std::wstring registryPath;// = L"SOFTWARE\\Netknights GmbH\\PrivacyIDEA-CP\\";
-	static const std::wstring registryRealmPath;// = registryPath + L"realm-mapping";
-
 	Configuration();
 
 	void printConfiguration();
 
-	PICONFIG piconfig;
-
-	std::wstring loginText = L"";
-	std::wstring otpFieldText = L"";
-	std::wstring newConfirmPassFieldText = L"";
-	std::wstring newPassFieldText = L"";
-	std::wstring passFieldText = L"";
-	std::wstring usernameFieldText = L"";
+	std::wstring loginText = L"Das Credential Provider";
 	std::wstring bitmapPath = L"";
-
-	bool twoStepHideOTP = false;
-	bool twoStepSendPassword = false;
-	bool twoStepSendEmptyPassword = false;
-	bool isSecondStep = false;
 
 	bool hideFullName = false;
 	bool hideDomainName = false;
 
-	bool showDomainHint = false;
-
-	bool releaseLog = false;
-
 	bool noDefault = false;
 
-	int hide_otp_sleep_s = 0;
-
-	int winVerMajor = 0;
-	int winVerMinor = 0;
-	int winBuildNr = 0;
-
-	bool pushAuthenticationSuccessful = false;
-
-	bool isRemoteSession = false;
-
 	bool doAutoLogon = false;
-
 	bool userCanceled = false;
-
-	Challenge challenge;
-	std::wstring defaultOTPFailureText = L"";
-	std::wstring defaultOTPHintText = L"";
-
-	std::wstring excludedAccount = L"";
-
 	bool clearFields = true;
-	bool bypassPrivacyIDEA = false;
-
-	int numberOfLockedUser = 0;
-	ICredentialProviderUserArray* lockedUsers = nullptr;
-
 
 	struct PROVIDER
 	{
@@ -112,12 +68,5 @@ public:
 		std::wstring domain = L"";
 		SecureWString password = L"";
 		std::wstring otp = L"";
-
-		bool passwordMustChange = false;
-		bool passwordChanged = false;
-
-		// ChangePassword
-		SecureWString newPassword1 = L"";
-		SecureWString newPassword2 = L"";
 	} credential;
 };

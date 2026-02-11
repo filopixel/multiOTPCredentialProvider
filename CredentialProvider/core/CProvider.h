@@ -1,10 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 **
-** Copyright	2012 Dominik Pretzsch
-**				2017 NetKnights GmbH
+** DasCredentialProvider - CProvider
 **
-** Author		Dominik Pretzsch
-**				Nils Behlen
+** Copyright 2026 Adamantic
 **
 **    Licensed under the Apache License, Version 2.0 (the "License");
 **    you may not use this file except in compliance with the License.
@@ -25,16 +23,13 @@
 
 #include <windows.h>
 #include <strsafe.h>
-#include <Wtsapi32.h>						
+#include <Wtsapi32.h>
 #include <Lm.h>
 #include <credentialprovider.h>
-
 #include <helpers.h>
+#include <memory>
 
 #include "CCredential.h"
-
-#define MAX_CREDENTIALS 3
-#define MAX_DWORD   0xffffffff        // maximum DWORD
 
 enum SERIALIZATION_AVAILABLE_FOR
 {
@@ -62,7 +57,7 @@ public:
 		return cRef;
 	}
 
-	#pragma warning( disable : 4838 )
+#pragma warning( disable : 4838 )
 	IFACEMETHODIMP QueryInterface(__in REFIID riid, __deref_out void** ppv)
 	{
 		static const QITAB qit[] =
@@ -92,30 +87,25 @@ public:
 	IFACEMETHODIMP SetUserArray(_In_ ICredentialProviderUserArray* users);
 
 	friend HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv);
-	
+
 protected:
 	CProvider();
 	__override ~CProvider();
 
 private:
 	void _CleanupSetSerialization();
-
-	void _GetSerializedCredentials(PWSTR *username, PWSTR *password, PWSTR *domain);
-	
+	void _GetSerializedCredentials(PWSTR* username, PWSTR* password, PWSTR* domain);
 	bool _SerializationAvailable(SERIALIZATION_AVAILABLE_FOR checkFor);
 
 private:
 	LONG									_cRef;
-
 	KERB_INTERACTIVE_UNLOCK_LOGON*          _pkiulSetSerialization;
-	DWORD                                   _dwSetSerializationCred; //index into rgpCredentials for the SetSerializationCred
+	DWORD                                   _dwSetSerializationCred;
 
 	std::unique_ptr<CCredential>			_credential;
+	std::shared_ptr<Configuration>			_config;
 
-	std::shared_ptr<MultiOTPConfiguration>			_config;
-
-	ICredentialProviderUserArray *_pCredProviderUserArray;
-
+	ICredentialProviderUserArray* _pCredProviderUserArray;
 };
 
 #endif

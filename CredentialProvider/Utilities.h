@@ -1,5 +1,25 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+**
+** DasCredentialProvider Utilities
+**
+** Copyright 2026 Adamantic
+**
+**    Licensed under the Apache License, Version 2.0 (the "License");
+**    you may not use this file except in compliance with the License.
+**    You may obtain a copy of the License at
+**
+**        http://www.apache.org/licenses/LICENSE-2.0
+**
+**    Unless required by applicable law or agreed to in writing, software
+**    distributed under the License is distributed on an "AS IS" BASIS,
+**    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+**    See the License for the specific language governing permissions and
+**    limitations under the License.
+**
+** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #pragma once
-#include "MultiOTPConfiguration.h"
+#include "Configuration.h"
 #include "Logger.h"
 #include <scenario.h>
 #include <memory>
@@ -17,21 +37,14 @@
 enum class SCENARIO
 {
 	NO_CHANGE = 0,
-	LOGON_BASE = 1,
-	UNLOCK_BASE = 2,
-	SECOND_STEP = 3,
-	LOGON_TWO_STEP = 4,
-	UNLOCK_TWO_STEP = 5,
-	CHANGE_PASSWORD = 6,
+	LOGON = 1,
+	UNLOCK = 2,
 };
 
 class Utilities
 {
 public:
-	Utilities(std::shared_ptr<MultiOTPConfiguration> c) noexcept;
-
-	// Returns the text for the id in english or german, depending on GetUserDefaultUILanguage
-	static std::wstring GetTranslatedText(int id);
+	Utilities(std::shared_ptr<Configuration> c) noexcept;
 
 	HRESULT KerberosLogon(
 		__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE*& pcpgsr,
@@ -39,15 +52,6 @@ public:
 		__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
 		__in std::wstring username,
 		__in SecureWString password,
-		__in std::wstring domain
-	);
-
-	HRESULT KerberosChangePassword(
-		__out CREDENTIAL_PROVIDER_GET_SERIALIZATION_RESPONSE* pcpgsr,
-		__out CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs,
-		__in std::wstring username,
-		__in SecureWString password_old,
-		__in SecureWString password_new,
 		__in std::wstring domain
 	);
 
@@ -60,7 +64,6 @@ public:
 		__in std::wstring domain
 	);
 
-	// Set all fields state depending on the scenario, then fill the fields depending on scenario and configuration
 	HRESULT SetScenario(
 		__in ICredentialProviderCredential* pCredential,
 		__in ICredentialProviderCredentialEvents* pCPCE,
@@ -85,35 +88,15 @@ public:
 		LPWSTR* rgFieldStrings,
 		DWORD field_index
 	);
-	
-	HRESULT ReadFieldValues();
 
-	static const FIELD_STATE_PAIR* GetFieldStatePairFor(CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, bool twoStepHideOTP);
+	HRESULT ReadFieldValues();
 
 	HRESULT ResetScenario(ICredentialProviderCredential* pSelf, ICredentialProviderCredentialEvents* pCredProvCredentialEvents);
 
 private:
-	std::shared_ptr<MultiOTPConfiguration> _config;
+	std::shared_ptr<Configuration> _config;
 
 	HRESULT ReadUserField();
-
 	HRESULT ReadPasswordField();
-
 	HRESULT ReadOTPField();
-
-	HRESULT ReadPasswordChangeFields();
-
-#define TEXT_USERNAME 0
-#define TEXT_PASSWORD 1
-#define TEXT_OLD_PASSWORD 2
-#define TEXT_NEW_PASSWORD 3
-#define TEXT_CONFIRM_PASSWORD 4
-#define TEXT_DOMAIN_HINT 5
-#define TEXT_OTP 6
-#define TEXT_WRONG_OTP 7
-#define TEXT_WRONG_PASSWORD 8
-#define TEXT_DEFAULT_OTP_HINT 9
-
-	const static std::wstring texts[10][2];
 };
-
