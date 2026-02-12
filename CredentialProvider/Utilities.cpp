@@ -216,10 +216,18 @@ HRESULT Utilities::SetScenario(
 		DebugPrint("SetScenario: LOGON");
 		hr = SetFieldStatePairBatch(pCredential, pCPCE, s_rgScenarioLogon);
 		break;
+	case SCENARIO::UNLOCK_BLOCKED:
+		DebugPrint("SetScenario: UNLOCK_BLOCKED");
+		hr = SetFieldStatePairBatch(pCredential, pCPCE, s_rgScenarioUnlockBlocked);
+		break;
 	case SCENARIO::NO_CHANGE:
 	default:
 		break;
 	}
+
+	// Do not overwrite the unlock block message
+	if (scenario == SCENARIO::UNLOCK_BLOCKED)
+		return hr;
 
 	// Set display text
 	const int hideFullName = _config->hideFullName;
@@ -341,7 +349,11 @@ HRESULT Utilities::InitializeField(
 		hr = SHStrDupW((user_name.empty() ? L"" : user_name.c_str()), &rgFieldStrings[field_index]);
 		break;
 	case FID_LARGE_TEXT:
-		if (!loginText.empty())
+		if (_config->provider.cpu == CPUS_UNLOCK_WORKSTATION)
+		{
+			hr = SHStrDupW(L"Chiudere e riaprire la sessione", &rgFieldStrings[field_index]);
+		}
+		else if (!loginText.empty())
 		{
 			hr = SHStrDupW(loginText.c_str(), &rgFieldStrings[field_index]);
 		}
@@ -464,8 +476,10 @@ HRESULT Utilities::ResetScenario(
 {
 	DebugPrint(__FUNCTION__);
 
-	// All scenarios (logon, unlock, credui) use the same LOGON layout
-	SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::LOGON);
+	if (_config->provider.cpu == CPUS_UNLOCK_WORKSTATION)
+		SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::UNLOCK_BLOCKED);
+	else
+		SetScenario(pSelf, pCredProvCredentialEvents, SCENARIO::LOGON);
 
 	return S_OK;
 }

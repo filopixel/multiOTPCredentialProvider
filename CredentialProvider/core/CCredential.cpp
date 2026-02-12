@@ -360,6 +360,13 @@ HRESULT CCredential::GetSerialization(
 	DebugPrint(__FUNCTION__);
 	*pcpgsr = CPGSR_RETURN_NO_CREDENTIAL_FINISHED;
 
+	if (_config->provider.cpu == CPUS_UNLOCK_WORKSTATION)
+	{
+		DebugPrint("GetSerialization: UNLOCK blocked, no credential");
+		*pcpgsr = CPGSR_NO_CREDENTIAL_NOT_FINISHED;
+		return S_OK;
+	}
+
 	HRESULT hr = E_FAIL;
 
 	_config->provider.pCredProvCredentialEvents = _pCredProvCredentialEvents;
@@ -456,6 +463,13 @@ HRESULT CCredential::Connect(__in IQueryContinueWithStatus* pqcws)
 {
 	DebugPrint(__FUNCTION__);
 	UNREFERENCED_PARAMETER(pqcws);
+
+	if (_config->provider.cpu == CPUS_UNLOCK_WORKSTATION)
+	{
+		DebugPrint("Connect: UNLOCK blocked, rejecting");
+		_authStatus = E_FAIL;
+		return S_OK;
+	}
 
 	_config->provider.pCredProvCredential = this;
 	_config->provider.pCredProvCredentialEvents = _pCredProvCredentialEvents;

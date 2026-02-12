@@ -38,6 +38,7 @@ enum class SCENARIO
 {
 	NO_CHANGE = 0,
 	LOGON = 1,
+	UNLOCK_BLOCKED = 2,
 };
 
 class Utilities

@@ -48,6 +48,18 @@ static const FIELD_STATE_PAIR s_rgScenarioLogonSerialized[] =
 	{ CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE },			// FID_SUBMIT_BUTTON
 };
 
+// Scenario: UNLOCK BLOCKED - Only logo and message, no interactive fields
+static const FIELD_STATE_PAIR s_rgScenarioUnlockBlocked[] =
+{
+	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LOGO
+	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_LARGE_TEXT (block message)
+	{ CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },					// FID_SMALL_TEXT (session username)
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_USERNAME
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_LDAP_PASS
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_OTP
+	{ CPFS_HIDDEN, CPFIS_NONE },							// FID_SUBMIT_BUTTON
+};
+
 // Field descriptors for unlock and logon.
 // The first field is the index of the field.
 // The second is the type of the field.
